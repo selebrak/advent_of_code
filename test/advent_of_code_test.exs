@@ -2,8 +2,8 @@ defmodule AdventOfCodeTest do
   use ExUnit.Case
   #TODO doctest AdventOfCode
 
-  @base_inputs_path Path.expand("../../support/inputs/", __DIR__)
-  @day01_input_path Path.join(@base_inputs_path, "2024-day-01-input.txt")
+  @base_inputs_path Path.expand("../priv/inputs/2024", __DIR__)
+  @day01_input_path Path.join(@base_inputs_path, "day-01-input.txt")
 
   test "Day 01 Star 1" do
     {list1, list2} = AdventOfCode.lists_from_file(@day01_input_path)
