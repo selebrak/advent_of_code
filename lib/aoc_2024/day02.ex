@@ -22,6 +22,6 @@ defmodule Aoc2024.Day02 do
     filename
     |> File.read!()
     |> String.split("\n", trim: true)
-    |> #TODO
+    |> IO.puts #TODO
   end
 end
