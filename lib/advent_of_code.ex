@@ -22,6 +22,20 @@ defmodule AdventOfCode do
     |> Enum.reduce(0, &+/2) # or Enum.sum()
   end
 
+  def similarity_score(list1, list2) do
+    list2_freqmap = Enum.frequencies(list2)
+
+    list1
+    |> Enum.map(&multiply_by_frequency(&1, list2_freqmap))
+    |> Enum.sum()
+  end
+
+  def multiply_by_frequency(input, freqmap) do
+    freqmap
+    |> Map.get(input, 0)
+    |> Kernel.*(input)
+  end
+
   def read_file(filename) do
     filename
     |> File.read!()
