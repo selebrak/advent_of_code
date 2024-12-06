@@ -1,25 +1,17 @@
 defmodule AdventOfCodeTest do
   use ExUnit.Case
-  doctest AdventOfCode
+  #TODO doctest AdventOfCode
 
-  test "day1 problem 1" do
-    assert read_two_column_file("../support/inputs/2024-day01-p1.txt") |> AdventOfCode.inter_list_distance == TODO
+  @base_inputs_path Path.expand("../../support/inputs/", __DIR__)
+  @day01_input_path Path.join(@base_inputs_path, "2024-day-01-input.txt")
+
+  test "Day 01 Star 1" do
+    {list1, list2} = AdventOfCode.read_file(@day01_input_path)
+    assert AdventOfCode.inter_list_distance(list1, list2) == 1506483
   end
 
-  def read_two_column_file(filename) do
-    filename
-    |> File.read!()
-    |> String.split("\n", trim: true)
-    |> Enum.map(fn line ->
-      line
-      |> String.split()
-      |> Enum.map(&String.to_integer/1)
-    end)
-    |> Enum.unzip()
-  end
-
-  def process_file(filename) do
-    {list1, list2} = read_two_column_file(filename)
-    calculate_total_differences(list1, list2)
+  test "Day 01 Star 2" do
+    {list1, list2} = AdventOfCode.read_file(@day01_input_path)
+    assert AdventOfCode.similarity_score(list1, list2) == 23126924
   end
 end
