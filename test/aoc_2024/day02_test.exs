@@ -4,8 +4,10 @@ defmodule Aoc2024.Day02Test do
 
   import Aoc2024.Day02
 
+  #TODO add tests for individual functions
+
   test "Day 01 Star 1" do
-    assert part1() == TODO
+    assert part1() == 572
   end
 
   test "Day 01 Star 2" do
