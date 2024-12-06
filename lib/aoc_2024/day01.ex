@@ -1,17 +1,26 @@
-defmodule AdventOfCode do
+defmodule Aoc2024.Day01 do
   @moduledoc """
-  Documentation for `AdventOfCode`.
+  Advent of Code Day 1 2024
   """
 
-  @doc """
-  Day one!
+  @base_inputs_path Path.expand("../../priv/inputs/2024", __DIR__)
+  @day01_input_path Path.join(@base_inputs_path, "day-01-input.txt")
 
-  ## Examples
+  def print_solutions() do
+    IO.puts(part1())
+    IO.puts(part2())
+  end
 
-      iex> AdventOfCode.day1()
-      <distance between lists>
+  def part1() do
+    {list1, list2} = lists_from_file(@day01_input_path)
+    inter_list_distance(list1, list2)
+  end
 
-  """
+  def part2() do
+    {list1, list2} = lists_from_file(@day01_input_path)
+    similarity_score(list1, list2)
+  end
+
   def inter_list_distance(list1, list2) do
     sorted_list1 = Enum.sort(list1)
     sorted_list2 = Enum.sort(list2)
