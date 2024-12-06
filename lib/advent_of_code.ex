@@ -36,7 +36,7 @@ defmodule AdventOfCode do
     |> Kernel.*(input)
   end
 
-  def read_file(filename) do
+  def lists_from_file(filename) do
     filename
     |> File.read!()
     |> String.split("\n", trim: true)
