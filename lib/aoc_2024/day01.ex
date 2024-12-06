@@ -3,8 +3,7 @@ defmodule Aoc2024.Day01 do
   Advent of Code Day 1 2024
   """
 
-  @base_inputs_path Path.expand("../../priv/inputs/2024", __DIR__)
-  @day01_input_path Path.join(@base_inputs_path, "day-01-input.txt")
+  @input_filepath Path.expand("../../priv/inputs/2024/day-01-input.txt", __DIR__)
 
   def print_solutions() do
     IO.puts(part1())
@@ -12,12 +11,12 @@ defmodule Aoc2024.Day01 do
   end
 
   def part1() do
-    {list1, list2} = lists_from_file(@day01_input_path)
+    {list1, list2} = lists_from_file(@input_filepath)
     inter_list_distance(list1, list2)
   end
 
   def part2() do
-    {list1, list2} = lists_from_file(@day01_input_path)
+    {list1, list2} = lists_from_file(@input_filepath)
     similarity_score(list1, list2)
   end
 
