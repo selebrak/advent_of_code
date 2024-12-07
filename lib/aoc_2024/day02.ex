@@ -11,11 +11,15 @@ defmodule Aoc2024.Day02 do
   end
 
   def part1() do
-    count_safe_reports(@input_filepath, &report_safe?/1)
+    @input_filepath
+    |> read_in_reports()
+    |> count_safe_reports(&report_safe?/1)
   end
 
   def part2() do
-    count_safe_reports(@input_filepath, &dampened_report_safe?/1)
+    @input_filepath
+    |> read_in_reports()
+    |> count_safe_reports(&dampened_report_safe?/1)
   end
 
   # returns a Stream of reports
@@ -26,9 +30,8 @@ defmodule Aoc2024.Day02 do
     |> Stream.map(&String.split/1)
   end
 
-  def count_safe_reports(filepath, check_function) do
-    filepath
-    |> read_in_reports()
+  def count_safe_reports(reports, check_function) do
+    reports
     |> Stream.map(fn report -> Enum.map(report, &String.to_integer/1) end)
     |> Task.async_stream(check_function)
     |> Stream.map(fn {:ok, result} -> result end)
@@ -74,7 +77,7 @@ defmodule Aoc2024.Day02 do
   def dampened_report_safe?([_e1]), do: 1
 
   # only two items left and we've not dampened a problem - report must be safe
-  def dampened_report_safe?([e1, e2]) do
+  def dampened_report_safe?([_e1, _e2]) do
     1
   end
 
