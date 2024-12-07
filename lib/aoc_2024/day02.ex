@@ -38,27 +38,32 @@ defmodule Aoc2024.Day02 do
     |> Enum.sum()
   end
 
+  def generate_diffs(list) do
+    list
+    |> Enum.zip(Kernel.tl(list))
+    |> Enum.map(fn {x,y} -> x - y end)
+  end
+
   def pos_bounded?(list, dampened?) do
+    diffs = generate_diffs(list)
+
     if dampened? == :undampened do
-      Enum.all?(list, fn x -> x in 1..3 end)
+      Enum.all?(diffs, fn x -> x in 1..3 end)
     end
   end
 
   def neg_bounded?(list, dampened?) do
+    diffs = generate_diffs(list)
+
     if dampened? == :undampened do
-      Enum.all?(list, fn x -> x in -1..-3//-1 end)
+      Enum.all?(diffs, fn x -> x in -1..-3//-1 end)
     end
   end
 
   def report_safe?(report, dampened? \\ :undampened) do
-    diffs =
-      report
-      |> Enum.zip(Kernel.tl(report))
-      |> Enum.map(fn {x,y} -> x - y end)
-
     tasks = [
-      Task.async(fn -> pos_bounded?(diffs, dampened?) end),
-      Task.async(fn -> neg_bounded?(diffs, dampened?) end)
+      Task.async(fn -> pos_bounded?(report, dampened?) end),
+      Task.async(fn -> neg_bounded?(report, dampened?) end)
     ]
 
     results =
