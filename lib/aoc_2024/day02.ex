@@ -18,12 +18,17 @@ defmodule Aoc2024.Day02 do
     count_safe_reports(@input_filepath, &dampened_report_safe?/1)
   end
 
-  def count_safe_reports(filepath, check_function) do
-    # TODO move file reading and data massaging into separate function?
+  # returns a Stream of reports
+  def read_in_reports(filepath) do
     filepath
     |> File.stream!()
     |> Stream.map(&String.trim/1)
     |> Stream.map(&String.split/1)
+  end
+
+  def count_safe_reports(filepath, check_function) do
+    filepath
+    |> read_in_reports()
     |> Stream.map(fn report -> Enum.map(report, &String.to_integer/1) end)
     |> Task.async_stream(check_function)
     |> Stream.map(fn {:ok, result} -> result end)
