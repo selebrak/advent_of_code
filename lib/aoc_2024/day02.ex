@@ -13,13 +13,13 @@ defmodule Aoc2024.Day02 do
   def part1() do
     @input_filepath
     |> read_in_reports()
-    |> count_safe_reports(&report_safe?/1)
+    |> count_safe_reports(:undampened)
   end
 
   def part2() do
     @input_filepath
     |> read_in_reports()
-    |> count_safe_reports(&dampened_report_safe?/1)
+    |> count_safe_reports(:dampened)
   end
 
   # returns a Stream of reports
@@ -28,40 +28,47 @@ defmodule Aoc2024.Day02 do
     |> File.stream!()
     |> Stream.map(&String.trim/1)
     |> Stream.map(&String.split/1)
+    |> Stream.map(fn report -> Enum.map(report, &String.to_integer/1) end)
   end
 
-  def count_safe_reports(reports, check_function) do
+  def count_safe_reports(reports, dampened? \\ :undampened) do
     reports
-    |> Stream.map(fn report -> Enum.map(report, &String.to_integer/1) end)
-    |> Task.async_stream(check_function)
+    |> Task.async_stream(fn report -> report_safe?(report, dampened?) end)
     |> Stream.map(fn {:ok, result} -> result end)
     |> Enum.sum()
   end
 
-  def report_safe?(report) do
+  def pos_bounded?(list, dampened?) do
+    if dampened? == :undampened do
+      Enum.all?(list, fn x -> x in 1..3 end)
+    end
+  end
+
+  def neg_bounded?(list, dampened?) do
+    if dampened? == :undampened do
+      Enum.all?(list, fn x -> x in -1..-3//-1 end)
+    end
+  end
+
+  def report_safe?(report, dampened? \\ :undampened) do
     diffs =
       report
       |> Enum.zip(Kernel.tl(report))
       |> Enum.map(fn {x,y} -> x - y end)
 
-    # Check all four safety conditions concurrently
     tasks = [
-      Task.async(fn -> Enum.all?(diffs, fn x -> x > 0 end) end),
-      Task.async(fn -> Enum.all?(diffs, fn x -> x in 1..3 end) end),
-      Task.async(fn -> Enum.all?(diffs, fn x -> x < 0 end) end),
-      Task.async(fn -> Enum.all?(diffs, fn x -> x in -1..-3//-1 end) end)
+      Task.async(fn -> pos_bounded?(diffs, dampened?) end),
+      Task.async(fn -> neg_bounded?(diffs, dampened?) end)
     ]
 
     results =
       tasks
       |> Task.await_many() #TODO use a Duration here?
 
-    [ all_pos, pos_bounded, all_neg, neg_bounded ] = results
+    [ pos_bounded, neg_bounded ] = results
 
     cond do
-      all_pos && pos_bounded ->
-        1
-      all_neg && neg_bounded ->
+      pos_bounded || neg_bounded ->
         1
       true ->
         0
