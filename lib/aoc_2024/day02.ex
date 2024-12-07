@@ -38,130 +38,33 @@ defmodule Aoc2024.Day02 do
     |> Enum.sum()
   end
 
-  def report_safe?([e1, e2 | tail]) do
-    diff = e1 - e2
+  def report_safe?(report) do
+    diffs =
+      report
+      |> Enum.zip(Kernel.tl(report))
+      |> Enum.map(fn {x,y} -> x - y end)
+
+    # Check all four safety conditions concurrently
+    tasks = [
+      Task.async(fn -> Enum.all?(diffs, fn x -> x > 0 end) end),
+      Task.async(fn -> Enum.all?(diffs, fn x -> x in 1..3 end) end),
+      Task.async(fn -> Enum.all?(diffs, fn x -> x < 0 end) end),
+      Task.async(fn -> Enum.all?(diffs, fn x -> x in -1..-3//-1 end) end)
+    ]
+
+    results =
+      tasks
+      |> Task.await_many() #TODO use a Duration here?
+
+    [ all_pos, pos_bounded, all_neg, neg_bounded ] = results
+
     cond do
-      diff in -1..-3//-1 ->
-        safe_up?([e2 | tail])
-      diff in 1..3//1 ->
-        safe_down?([e2 | tail])
+      all_pos && pos_bounded ->
+        1
+      all_neg && neg_bounded ->
+        1
       true ->
         0
-    end
-  end
-
-  def safe_up?([_e1]), do: 1
-
-  def safe_up?([e1, e2 | tail]) do
-    diff = e1 - e2
-    cond do
-      diff in -1..-3//-1 ->
-        safe_up?([e2 | tail])
-      true ->
-        0
-    end
-  end
-
-  def safe_down?([_e1]), do: 1
-
-  def safe_down?([e1, e2 | tail]) do
-    diff = e1 - e2
-    cond do
-      diff in 1..3//1 ->
-        safe_down?([e2 | tail])
-      true ->
-        0
-    end
-  end
-
-  def dampened_report_safe?([_e1]), do: 1
-
-  # only two items left and we've not dampened a problem - report must be safe
-  def dampened_report_safe?([_e1, _e2]) do
-    1
-  end
-
-  def dampened_report_safe?([e1, e2 | tail]) do
-    diff = e1 - e2
-    cond do
-      diff in -1..-3//-1 ->
-        dampened_safe_up?([e2 | tail])
-      diff in 1..3//1 ->
-        dampened_safe_down?([e2 | tail])
-      true ->
-        remove_unsafe(e1, e2, hd(tail)) ++ tail
-        |> report_safe?()
-    end
-  end
-
-  def dampened_safe_up?([_e1]), do: 1
-
-  def dampened_safe_up?([e1, e2]) do
-    safe_up?([e1, e2])
-  end
-
-  def dampened_safe_up?([e1, e2 | tail]) do
-    diff = e1 - e2
-    cond do
-      diff in -1..-3//-1 ->
-        dampened_safe_up?([e2 | tail])
-      true ->
-        remove_unsafe(e1, e2, hd(tail)) ++ tail
-        |> safe_up?()
-    end
-  end
-
-  def dampened_safe_down?([_e1]), do: 1
-
-  def dampened_safe_down?([e1, e2]) do
-    safe_down?([e1, e2])
-  end
-
-  def dampened_safe_down?([e1, e2 | tail]) do
-    diff = e1 - e2
-    cond do
-      diff in 1..3//1 ->
-        dampened_safe_down?([e2 | tail])
-      true ->
-        remove_unsafe(e1, e2, hd(tail)) ++ tail
-        |> safe_down?()
-    end
-  end
-  # returns a list of the two elements we should keep
-  def remove_unsafe(e1, e2, e3, direction \\ :none) do
-    diff_p1 = e1 - e2
-    diff_p2 = e2 - e3
-
-    case direction do
-      :up ->
-        cond do
-          diff_p1 >= 0 ->
-            [e2, e3]
-          diff_p2 >= 0 ->
-            [e1, e3]
-          true ->
-            [e1, e2]
-        end
-      :down ->
-        cond do
-          diff_p1 <= 0 ->
-            [e2, e3]
-          diff_p2 <= 0 ->
-            [e1, e2]
-          true ->
-            [e1, e3]
-        end
-      :none ->
-        cond do
-          diff_p1 == 0 || diff_p2 == 0 ->
-            [e2, e3]
-          diff_p1 > 3 || diff_p2 < -3 ->
-            [e2, e3]
-          diff_p1 < -3 || diff_p2 > 3 ->
-            [e1, e3]
-          true ->
-            [e1, e3]
-        end
     end
   end
 end
