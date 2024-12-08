@@ -7,7 +7,7 @@ defmodule Aoc2024.Day03Test do
   #TODO add tests for individual functions
 
   test "Day 03 Star 1" do
-    assert part1() == nil
+    assert part1() == 179571322
   end
 
   test "Day 03 Star 2" do
