@@ -11,6 +11,6 @@ defmodule Aoc2024.Day02Test do
   end
 
   test "Day 01 Star 2" do
-    assert part2() == nil
+    assert part2() == 612
   end
 end

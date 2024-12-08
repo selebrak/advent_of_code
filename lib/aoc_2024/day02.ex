@@ -44,26 +44,20 @@ defmodule Aoc2024.Day02 do
     |> Enum.map(fn {x,y} -> x - y end)
   end
 
-  def pos_bounded?(list, dampened?) do
-    diffs = generate_diffs(list)
-
-    if dampened? == :undampened do
-      Enum.all?(diffs, fn x -> x in 1..3 end)
-    end
+  def pos_bounded?(list) do
+    generate_diffs(list)
+    |> Enum.all?(fn x -> x in 1..3 end)
   end
 
-  def neg_bounded?(list, dampened?) do
-    diffs = generate_diffs(list)
-
-    if dampened? == :undampened do
-      Enum.all?(diffs, fn x -> x in -1..-3//-1 end)
-    end
+  def neg_bounded?(list) do
+    generate_diffs(list)
+    |> Enum.all?(fn x -> x in -1..-3//-1 end)
   end
 
-  def report_safe?(report, dampened? \\ :undampened) do
+  def all_bounded?(report) do
     tasks = [
-      Task.async(fn -> pos_bounded?(report, dampened?) end),
-      Task.async(fn -> neg_bounded?(report, dampened?) end)
+      Task.async(fn -> pos_bounded?(report) end),
+      Task.async(fn -> neg_bounded?(report) end)
     ]
 
     results =
@@ -72,11 +66,25 @@ defmodule Aoc2024.Day02 do
 
     [ pos_bounded, neg_bounded ] = results
 
-    cond do
-      pos_bounded || neg_bounded ->
-        1
-      true ->
-        0
+    if pos_bounded || neg_bounded, do: 1, else: 0
+  end
+
+  def report_safe?(report, dampened? \\ :undampened) do
+    if dampened? == :undampened do
+      all_bounded?(report)
+    else
+      # We naively attempt to delete each element and re-check without it
+      # If any attempts are bounded, then the report is safe
+      bounded_attempts =
+        0..(Kernel.length(report) - 1)
+        |> Task.async_stream(fn index ->
+          report
+          |> List.delete_at(index)
+          |> all_bounded?()
+        end)
+        |> Enum.reduce(0, fn {:ok, result}, acc -> acc + result end)
+
+      if bounded_attempts > 0, do: 1, else: 0
     end
   end
 end
