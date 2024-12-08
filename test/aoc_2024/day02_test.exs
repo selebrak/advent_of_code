@@ -6,11 +6,11 @@ defmodule Aoc2024.Day02Test do
 
   #TODO add tests for individual functions
 
-  test "Day 01 Star 1" do
+  test "Day 02 Star 1" do
     assert part1() == 572
   end
 
-  test "Day 01 Star 2" do
+  test "Day 02 Star 2" do
     assert part2() == 612
   end
 end
